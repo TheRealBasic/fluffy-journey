@@ -1,45 +1,34 @@
 import type { DiagnosticAction, Fault, RepairAction, Upgrade } from '../types';
 
-export const diagnostics: DiagnosticAction[] = [
-  'Visual inspection','OBD scan','Compression test','Smoke test','Brake inspection','Multimeter test','Test drive','Listen for noises','Fuel pressure test',
-  'Battery load test','Vacuum leak check','Thermal camera scan','Scope ignition waveform','Wheel speed sensor read','Charging system stress test'
+export const diagnostics: DiagnosticAction[] = ['Visual inspection','OBD scan','Compression test','Smoke test','Brake inspection','Multimeter test','Test drive','Fuel pressure test'];
+export const repairs: RepairAction[] = ['Battery replacement','Alternator replacement','Ground wire fix','Starter replacement','Fuel pump replacement','Ignition coil replacement','Brake pads replacement','Wheel cylinder replacement','Exhaust patch','Lambda sensor replacement','Throttle cleaning','Timing belt replacement','Fluid top-up','Dodgy fix'];
+
+const def:[string,string[],DiagnosticAction[],RepairAction[],RepairAction[]][]=[
+['Dead battery',['click no start','dash resets'],['Multimeter test','Visual inspection'],['Battery replacement'],['Alternator replacement']],
+['Weak alternator',['battery light','dim lamps'],['Multimeter test','Test drive'],['Alternator replacement'],['Starter replacement']],
+['Bad ground',['random cut-out','flickering dash'],['Visual inspection','Multimeter test'],['Ground wire fix'],['Battery replacement']],
+['Tired starter',['single click','hot crank smell'],['Visual inspection','Multimeter test'],['Starter replacement'],['Fuel pump replacement']],
+['Low fuel pressure',['stalls uphill','hesitation'],['Fuel pressure test','Test drive'],['Fuel pump replacement'],['Ignition coil replacement']],
+['Failed coil',['misfire','rough idle'],['OBD scan','Test drive'],['Ignition coil replacement'],['Fuel pump replacement']],
+['Worn pads',['squeal on braking','long stopping'],['Brake inspection','Test drive'],['Brake pads replacement'],['Wheel cylinder replacement']],
+['Leaky wheel cylinder',['spongy pedal','rear wet brake'],['Brake inspection','Visual inspection'],['Wheel cylinder replacement'],['Brake pads replacement']],
+['Exhaust leak',['fumes in cabin','raspy note'],['Smoke test','Visual inspection'],['Exhaust patch'],['Lambda sensor replacement']],
+['Lazy lambda sensor',['poor mpg','check engine lamp'],['OBD scan','Test drive'],['Lambda sensor replacement'],['Exhaust patch']],
+['Sticky throttle',['hunting idle','flat response'],['OBD scan','Visual inspection'],['Throttle cleaning'],['Fluid top-up']],
+['Timing belt wear',['chirp front','poor pull'],['Visual inspection','Compression test'],['Timing belt replacement'],['Throttle cleaning']],
+['Low fluids',['temp creeping','whine on steering'],['Visual inspection','Test drive'],['Fluid top-up'],['Timing belt replacement']],
+['Intermittent immobiliser',['starts then dies','key light flashing'],['OBD scan','Multimeter test'],['Ground wire fix','Battery replacement'],['Fuel pump replacement']],
+['Barn find sludge',['smoke puff','sticky lifters'],['Compression test','Visual inspection'],['Fluid top-up','Throttle cleaning'],['Lambda sensor replacement']],
 ];
 
-export const repairs: RepairAction[] = [
-  'Replace battery','Replace alternator','Fix ground wire','Replace starter','Replace fuel pump','Replace ignition coil','Replace brake pads','Replace wheel cylinder','Patch exhaust leak','Replace lambda sensor','Clean throttle body','Replace timing belt','Top up fluids','Reset ECU adaptives','Clean battery terminals','Replace crank sensor','Bleed brake system','Do nothing and hope','Dodgy fix'
+export const faults: Fault[] = Array.from({length:30}).map((_,i)=>{const b=def[i%def.length];return{id:`f${i}`,name:b[0],symptoms:b[1],goodDiagnostics:b[2],goodRepairs:b[3],wrongRepairs:b[4],severity:1+i%5,complaintRisk:0.15+(i%5)*0.09};});
+const makes=['Borkley','Vauxham','Skodoodle','Toyonda','Fjord','Peughost','Cit-roan','Nis-soon'];
+const models=['Rustler','Estate of Doom','TurboSulk','Nanline','Courier Catastrophe'];
+export const carTemplates=Array.from({length:40}).map((_,i)=>`${makes[i%makes.length]} ${models[i%models.length]} Mk${1+i%6}`);
+export const customerMessages=[
+"Only misbehaves when my mother-in-law visits.","I watched a tutorial and now the fusebox hums.","Please fix before school pickup, no pressure.","It smells expensive.","The warning light winked at me.","I need cheap, fast, and perfect.",
+...Array.from({length:24}).map((_,i)=>`Customer note ${i+1}: confident nonsense delivered politely.`)
 ];
-
-const baseFaults = [
-['bad_alternator',['battery light','weak start','dim lights'],['Multimeter test','Charging system stress test'],['Replace alternator','Replace battery']],
-['dead_battery',['click no start','dash resets'],['Multimeter test','Battery load test'],['Replace battery','Clean battery terminals']],
-['ground_fault',['random cutout','flickering dash'],['Multimeter test','Visual inspection'],['Fix ground wire']],
-['starter_fault',['single click','hot smell'],['Visual inspection','Multimeter test'],['Replace starter']],
-['fuel_pump_weak',['cranks forever','stalls uphill'],['Fuel pressure test','Test drive'],['Replace fuel pump']],
-['coil_fault',['misfire','rough idle'],['OBD scan','Scope ignition waveform'],['Replace ignition coil']],
-['brakes_worn',['squeal braking','long stop distance'],['Brake inspection','Test drive'],['Replace brake pads','Bleed brake system']],
-['wheel_cyl_leak',['spongy pedal','rear brake wet'],['Brake inspection','Visual inspection'],['Replace wheel cylinder','Bleed brake system']],
-['exhaust_leak',['raspy noise','fumes cabin'],['Smoke test','Listen for noises'],['Patch exhaust leak']],
-['o2_sensor_bad',['poor mpg','check engine'],['OBD scan','Test drive'],['Replace lambda sensor','Reset ECU adaptives']],
-['throttle_dirty',['hunting idle','hesitation'],['OBD scan','Visual inspection'],['Clean throttle body','Reset ECU adaptives']],
-['timing_belt_worn',['chirp front','won’t rev'],['Visual inspection','Compression test'],['Replace timing belt']],
-['vacuum_leak',['high idle','lean code'],['Vacuum leak check','Smoke test'],['Reset ECU adaptives']],
-['crank_sensor_fault',['random stall','no rpm signal'],['OBD scan','Scope ignition waveform'],['Replace crank sensor']],
-];
-
-export const faults: Fault[] = Array.from({ length: 45 }).map((_, i) => {
-  const b = baseFaults[i % baseFaults.length];
-  return { id: `${b[0]}_${i}`, name: String(b[0]).replaceAll('_', ' '), symptoms: b[1] as string[], goodDiagnostics: b[2] as string[], goodRepairs: b[3] as string[], severity: 1 + (i % 5), complaintRisk: 0.1 + (i % 6) * 0.07 };
-});
-
-const makes = ['Borkley','Snorvo','Vauxham','Skodoodle','Toyonda','Peughost','Fjord','Civique'];
-const models = ['Rustler','Nimbus','TurboSulk','Estate of Doom','GTi-ish','NanSpec','BarnStorm'];
-export const carTemplates = Array.from({ length: 40 }).map((_, i) => `${makes[i % makes.length]} ${models[i % models.length]} ${1998 + (i % 25)}`);
-
-export const customerMessages = [
-  "It only knocks when my nan drives it.","I fixed it with Facebook advice and now there's smoke.","Battery light's on but only in Tesco car park.","Please hurry, school run in 20.","Mate said it just needs Italian tune-up.","Can you make it cheap but perfect?",
-  ...Array.from({ length: 24 }).map((_, i) => `Customer rant #${i + 1}: very specific and mildly cursed.`)
-];
-
-export const randomEvents = ['Power cut tea break','Inspector visit','Free biscuit morale boost','Parts van late','Shop cat sleeps on bonnet','Rain leak on bay 2','Neighbour rev war','Local influencer livestream','Torque wrench vanished','Mystery coolant puddle'];
-export const achievements = ['First MOT-ivation','Five jobs alive','Ten-day survivor','Legendary save','No complaint day','Grease lightning','Nan-approved fix','Chaos tamer'];
-export const upgrades: Upgrade[] = Array.from({ length: 20 }).map((_, i) => ({ id: `up${i}`, name: [`Faster scanner`,`Premium spanners`,`Apprentice Kev`,`Calm playlist`,`Better lighting`][i % 5] + ` ${Math.floor(i / 5) + 1}`, cost: 200 + i * 120, desc: 'Improves speed, stress, or payout.', effect: i % 3 }));
+export const randomEvents=['Parts van delayed','Tea morale miracle','Inspector surprise audit','Neighbour starts rev contest','Power dip at lunch','Local radio wants an interview','Mystery coolant puddle appears','Storm leaks through roof','Apprentice finds lost tools','Customer brings biscuits'];
+export const achievements=['First Spanner','Five Honest Fixes','Ten Day Survivor','No-Complaint Day','Stress Whisperer','Chaos Controller','Legendary Delivery','Thirty Day Legend'];
+export const upgrades:Upgrade[]=Array.from({length:20}).map((_,i)=>({id:`up${i}`,name:`Workshop Upgrade ${i+1}`,cost:220+i*130,desc:'Improves operations.',effect:(['speed','stress','rep','parts'] as const)[i%4],amount:1+i%3}));
